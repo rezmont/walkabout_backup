@@ -1,0 +1,81 @@
+#/!bin/bash -l
+
+### Job name
+#PBS -N WA_all
+### Output files
+#PBS -o WA_all.log.stdout
+#PBS -e WA_all.log.stderr
+#PBS -d /home7/motamedi/data
+### Queue name 
+### PBS -q generic
+### PBS -q longfat
+### PBS -q fatnodes
+# PBS -q longgen
+### Number of nodes 
+#PBS -l nodes=1:ppn=1
+
+### PBS -l nodes=1:ppn=6
+### Join the STDOUT and STDERR output streams into STDOUT
+### PBS -j oe
+### Write STDOUT to $osn\lus_first.log
+### PBS -o $osn\lus_first.log
+
+# Change directories into my_app inside my home directory
+# cd /home7/motamedi/wa/walkabout
+
+# run Walks
+# ./run -task 6 -model 6 -topofile /home7/motamedi/wa/snapshots/tw/tw_undir.bin -wlen 50 -dumpdir ../data/shwalk -nettype tw -batch -nwp 1 > twitterLoadnRun_nwp1.log
+# ./run -task 6 -model 6 -topofile /home7/motamedi/wa/snapshots/tw/tw_undir.bin -wlen 50 -dumpdir ../data/shwalk -nettype tw -batch -nwp 0.1 > twitterLoadnRun_nwp0.1.log
+# ./run -task 6 -model 6 -topofile /home7/motamedi/wa/snapshots/tw/tw_undir.bin -wlen 50 -dumpdir ../data/shwalk -nettype tw -batch -nwp 0.01 > twitterLoadnRun_nwp0.01.log
+for osn in fl; do
+	
+	# Convert
+	# echo ./run -task 18 -model 5 -topofile /home/motamedi/workspace/QT/snapshots/$osn/$osn\_undir.tab -outfile /home/motamedi/workspace/QT/snapshots/$osn/$osn\_undir_wa.bin
+	# ./run -task 18 -model 5 -topofile /home/motamedi/workspace/QT/snapshots/$osn/$osn\_undir.tab -outfile /home/motamedi/workspace/QT/snapshots/$osn/$osn\_undir_wa.bin
+	
+	# PageRank	
+	# echo ./run -task 21 -model 6 -topofile /home7/motamedi/wa/snapshots/$osn/$osn\_undir.bin -wlen 50 -dumpdir ../data/shwalk -nettype $osn -ignoreInit 2 \> $osn\_PageRank2.log &
+	# ./run -task 21 -model 6 -topofile /home7/motamedi/wa/snapshots/$osn/$osn\_undir.bin -wlen 50 -dumpdir ../data/shwalk -nettype $osn -ignoreInit 2 > $osn\_PageRank2.log &
+	
+	# Assign to core
+	# ./run -task 17 -model 6 -topofile /home7/motamedi/wa/snapshots/$osn/$osn\_undir.bin -RWdistFiles /home7/motamedi/wa/pageRankClust/$osn\_regions_select.txt -nw 100 -wlen 60 -justLCC -nettype $osn\_filtDeg500_DegreeSum -dumpdir data/classified -walk_seed 100 > $osn\_LoadnExpand_wl_LCC.log &
+	# echo ./run -task 17 -model 6 -topofile /home7/motamedi/wa/snapshots/$osn/$osn\_undir.bin -RWdistFiles /home7/motamedi/wa/pageRankClust/$osn\_regions_select.txt -nw 100 -wlen 60 -justLCC -nettype $osn\_filtDeg500_DegreeSum -dumpdir data/classified -walk_seed 100
+
+	# ./run -task 17 -model 6 -topofile /home7/motamedi/wa/snapshots/$osn/$osn\_undir.bin -RWdistFiles /home7/motamedi/wa/pageRankClust/$osn\_regions_select.txt -nw 100 -wlen 60 -nettype $osn\_filtDeg500_DegreeSum -dumpdir data/classified -walk_seed 100 > $osn\_LoadnExpand_wl.log &
+	# echo ./run -task 17 -model 6 -topofile /home7/motamedi/wa/snapshots/$osn/$osn\_undir.bin -RWdistFiles /home7/motamedi/wa/pageRankClust/$osn\_regions_select.txt -nw 100 -wlen 60 -nettype $osn\_filtDeg500_DegreeSum -dumpdir data/classified -walk_seed 100
+	
+	# for deg in 550 450; do
+	#  	./run -task 17 -model 6 -topofile /home7/motamedi/wa/snapshots/$osn/$osn\_undir.bin -RWdistFiles /home7/motamedi/wa/pageRankClust/$osn\_filtDeg$deg\_regions_select.txt -nw 100 -wlen 60 -justLCC -nettype $osn\_filtDeg$deg\_DegreeSum -dumpdir data/classified -walk_seed 100 > $osn\_filtDeg$deg\_wl_LoadnExpand_LCC.log &
+	# 	echo ./run -task 17 -model 6 -topofile /home7/motamedi/wa/snapshots/$osn/$osn\_undir.bin -RWdistFiles /home7/motamedi/wa/pageRankClust/$osn\_filtDeg$deg\_regions_select.txt -nw 100 -wlen 60 -justLCC -nettype $osn\_filtDeg$deg\_DegreeSum -wlen 60 -dumpdir data/classified -walk_seed 100
+
+	# 	./run -task 17 -model 6 -topofile /home7/motamedi/wa/snapshots/$osn/$osn\_undir.bin -RWdistFiles /home7/motamedi/wa/pageRankClust/$osn\_filtDeg$deg\_regions_select.txt -nw 100 -wlen 60 -nettype $osn\_filtDeg$deg\_DegreeSum -dumpdir data/classified -walk_seed 100 > $osn\_filtDeg$deg\_wl_LoadnExpand.log &
+	# 	echo ./run -task 17 -model 6 -topofile /home7/motamedi/wa/snapshots/$osn/$osn\_undir.bin -RWdistFiles /home7/motamedi/wa/pageRankClust/$osn\_filtDeg$deg\_regions_select.txt -nw 100 -wlen 60 -nettype $osn\_filtDeg$deg\_DegreeSum -wlen 60 -dumpdir data/classified -walk_seed 100
+	# done
+
+	
+	# # mapping louvain
+	# echo ./run -task 19 -model 6 -topofile /home7/motamedi/wa/snapshots/$osn/$osn\_undir.bin -part /home7/motamedi/wa/walkabout/data/classified/$osn\_filtDeg500_DegreeSum_nw_100_LCC_wl_parts.txt -groupfile /home7/motamedi/daily/workspace/Community_latest/data/$osn\_node2comm -nettype $osn -outfile data/community/$osn\_comm_2_filtDeg500_LCC.tab 
+	# ./run -task 19 -model 6 -topofile /home7/motamedi/wa/snapshots/$osn/$osn\_undir.bin -part /home7/motamedi/wa/walkabout/data/classified/$osn\_filtDeg500_DegreeSum_nw_100_LCC_wl_parts.txt -groupfile /home7/motamedi/daily/workspace/Community_latest/data/$osn\_node2comm -nettype $osn -outfile data/community/$osn\_comm_2_filtDeg500_LCC.tab > /home7/motamedi/wa/walkabout/data/community/$osn\_comm_2_filtDeg500_LCC.log &
+	# echo ./run -task 19 -model 6 -topofile /home7/motamedi/wa/snapshots/$osn/$osn\_undir.bin -part /home7/motamedi/wa/walkabout/data/classified/$osn\_filtDeg500_DegreeSum_nw_100_wl_parts.txt -groupfile /home7/motamedi/daily/workspace/Community_latest/data/$osn\_node2comm -nettype $osn -outfile data/community/$osn\_comm_2_filtDeg500.tab 
+	# ./run -task 19 -model 6 -topofile /home7/motamedi/wa/snapshots/$osn/$osn\_undir.bin -part /home7/motamedi/wa/walkabout/data/classified/$osn\_filtDeg500_DegreeSum_nw_100_wl_parts.txt -groupfile /home7/motamedi/daily/workspace/Community_latest/data/$osn\_node2comm -nettype $osn -outfile data/community/$osn\_comm_2_filtDeg500.tab > /home7/motamedi/wa/walkabout/data/community/$osn\_comm_2_filtDeg500.log &
+
+	
+	# # region prop
+	echo ./run -task 14 -model 6 -topofile /home/motamedi/workspace/QT/snapshots/$osn/$osn\_undir_wa.bin -community /home/motamedi/workspace/QT/louvain/graph_node2comm_level7.tab -outfile /home/motamedi/workspace/QT/walkabout/data/regionProp/$osn\_louvain_Prop_table.txt -full
+	./run -task 14 -model 6 -topofile /home/motamedi/workspace/QT/snapshots/$osn/$osn\_undir_wa.bin -community /home/motamedi/workspace/QT/louvain/graph_node2comm_level7.tab -outfile /home/motamedi/workspace/QT/walkabout/data/regionProp/$osn\_louvain_Prop_table.txt -full
+	
+		
+	# # group mapping to WA
+	# mem_thrsh=1
+	# echo ./run -task 11 -model 6 -topofile /home7/motamedi/wa/snapshots/$osn/$osn\_undir.bin -groupfile /home7/motamedi/wa/snapshots/$osn/$osn\_groupmemberships.txt -mem_thrsh $mem_thrsh -min_grp_pop -1 -max_grp_pop -1 -min_nd_deg -1 -max_nd_deg -1 -part /home7/motamedi/wa/walkabout/data/classified/$osn\_filtDeg500_DegreeSum_nw_100_wl_parts.txt -outfile /home7/motamedi/wa/walkabout/data/groups/$osn\_nw_100_wl_minDeg_-1_maxdeg_-1_membership_Grp.txt \> $osn\_nw_100_wl_minDeg_-1_maxdeg_-1_membership_Grp.log
+	# ./run -task 11 -model 6 -topofile /home7/motamedi/wa/snapshots/$osn/$osn\_undir.bin -groupfile /home7/motamedi/wa/snapshots/$osn/$osn\_groupmemberships.txt -mem_thrsh $mem_thrsh -min_grp_pop -1 -max_grp_pop -1 -min_nd_deg -1 -max_nd_deg -1 -part /home7/motamedi/wa/walkabout/data/classified/$osn\_filtDeg500_DegreeSum_nw_100_wl_parts.txt -outfile /home7/motamedi/wa/walkabout/data/groups/$osn\_nw_100_wl_minDeg_-1_maxdeg_-1_membership_Grp.txt > $osn\_nw_100_wl_minDeg_-1_maxdeg_-1_membership_Grp.log &
+
+	# # group mapping to Louvain
+	# mem_thrsh=1
+	# echo ./run -task 11 -model 6 -topofile /home7/motamedi/wa/snapshots/$osn/$osn\_undir.bin -groupfile /home7/motamedi/wa/snapshots/$osn/$osn\_groupmemberships.txt -mem_thrsh $mem_thrsh -min_grp_pop -1 -max_grp_pop -1 -min_nd_deg -1 -max_nd_deg -1 -community /home7/motamedi/daily/workspace/Community_latest/data/$osn\_node2comm -outfile /home7/motamedi/wa/walkabout/data/groups/$osn\_comm_minDeg_-1_maxdeg_-1_membership_Grp.txt \> $osn\_comm_minDeg_-1_maxdeg_-1_membership_Grp.log
+	# ./run -task 11 -model 6 -topofile /home7/motamedi/wa/snapshots/$osn/$osn\_undir.bin -groupfile /home7/motamedi/wa/snapshots/$osn/$osn\_groupmemberships.txt -mem_thrsh $mem_thrsh -min_grp_pop -1 -max_grp_pop -1 -min_nd_deg -1 -max_nd_deg -1 -community /home7/motamedi/daily/workspace/Community_latest/data/$osn\_node2comm -outfile /home7/motamedi/wa/walkabout/data/groups/$osn\_comm_minDeg_-1_maxdeg_-1_membership_Grp.txt > $osn\_comm_minDeg_-1_maxdeg_-1_membership_Grp.log &
+
+	# transition Prob
+	# echo ./run -task 20 -model 6 -topofile /home7/motamedi/wa/snapshots/$osn/$osn\_undir.bin -dumpdir /home7/motamedi/wa/walkabout/data/transition -nettype $osn\_filtDeg500_DegreeSum -nw 10 -part /home7/motamedi/wa/pageRankClust/$osn\_top.txt -outfile /home7/motamedi/wa/walkabout/data/transition/$osn\_topTrans.txt
+	# ./run -task 20 -model 6 -topofile /home7/motamedi/wa/snapshots/$osn/$osn\_undir.bin -dumpdir /home7/motamedi/wa/walkabout/data/transition -nettype $osn\_filtDeg500_DegreeSum -nw 10 -part /home7/motamedi/wa/pageRankClust/$osn\_top.txt -outfile /home7/motamedi/wa/walkabout/data/transition/$osn\_topTrans.txt &
+done
