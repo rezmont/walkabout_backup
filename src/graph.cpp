@@ -489,6 +489,10 @@ void readCoreFile(Graph& graph, int& partCount, vector<int>& partSize, char* fil
     while(!partFile.eof()) {
         str.clear();
         getline(partFile,str);
+        if (str[0] == '#') {
+            continue;
+        }
+
         tkns.clear();
         Tokenize (str,tkns,"\t");
         if (tkns.size()) {

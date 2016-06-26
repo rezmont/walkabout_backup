@@ -1114,39 +1114,38 @@ int main ( int argc, char **argv ) {
 
         break;
     }
-//    case 24: { /* Calcualte top N reach */
-//        switch (graph_type) {
-//        case 5: {
-//            unsigned begin_t=clock();
-//            graph = graph_new_load(topofile);
-//            unsigned end_t=clock();
-//            printf("# graph new_loaded in %f secs.\n",double(diffclock(end_t,begin_t)));
-//            break;
-//        }
-//        case 6: {
-//            QFile file(topofile);
-//            unsigned begin_t=clock();
-//            file.open(QIODevice::ReadOnly);
-//            QDataStream ds2(&file);
-//            ds2 >> graph;
-//            unsigned end_t=clock();
-//            printf("graph bin loaded in %f secs.\n\n",double(diffclock(end_t,begin_t)));
-//            break;
-//        }
-//        default:
-//            exit(-1);
-//        };
-//        unsigned begin_t=clock();
-//        calculateHighDegreeReach();
-//        unsigned end_t=clock();
-//        printf("loaded communities in %f secs.\n\n",double(diffclock(end_t,begin_t)));
-//        communityProperties(graph, allCommunities, outFile);
-//        break;
+        //    case 24: { /* Calcualte top N reach */
+        //        switch (graph_type) {
+        //        case 5: {
+        //            unsigned begin_t=clock();
+        //            graph = graph_new_load(topofile);
+        //            unsigned end_t=clock();
+        //            printf("# graph new_loaded in %f secs.\n",double(diffclock(end_t,begin_t)));
+        //            break;
+        //        }
+        //        case 6: {
+        //            QFile file(topofile);
+        //            unsigned begin_t=clock();
+        //            file.open(QIODevice::ReadOnly);
+        //            QDataStream ds2(&file);
+        //            ds2 >> graph;
+        //            unsigned end_t=clock();
+        //            printf("graph bin loaded in %f secs.\n\n",double(diffclock(end_t,begin_t)));
+        //            break;
+        //        }
+        //        default:
+        //            exit(-1);
+        //        };
+        //        unsigned begin_t=clock();
+        //        calculateHighDegreeReach();
+        //        unsigned end_t=clock();
+        //        printf("loaded communities in %f secs.\n\n",double(diffclock(end_t,begin_t)));
+        //        communityProperties(graph, allCommunities, outFile);
+        //        break;
     }
-        if (dumponly) {
-            displayGraph(graph);
-        }
-        return 0;
+    if (dumponly) {
+        displayGraph(graph);
     }
+    return 0;
 }
 

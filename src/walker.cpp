@@ -2052,7 +2052,7 @@ void partRWTransitionCounter(Graph graph, char* dumpDir, char* nettype, int num_
     cout<<"# Graph Nodes: "<<graph.noNodes<<"\n";
     cout<<"# Graph Edges: "<<graph.noEdges<<"\n";
 
-    walkLen = graph.noNodes*10;
+    walkLen = graph.noNodes;
 
     int allKnownNodes=0;
     int partCount=0;
@@ -2077,12 +2077,15 @@ void partRWTransitionCounter(Graph graph, char* dumpDir, char* nettype, int num_
     }
 
     vector < int > coreName = vector < int >(allKnownNodes,-1);
-    vector < vector <float> > tranMatrixNormal = vector < vector <float> > ( allKnownNodes, vector <float> (allKnownNodes,0));
-    vector < vector <float> > distMatrix = vector < vector <float> > ( allKnownNodes, vector <float> (allKnownNodes,0));
-    vector < vector <float> > tranMatrix = vector < vector <float> > ( allKnownNodes, vector <float> (allKnownNodes,0));
-    vector < float > tranArrayNormal = vector <float> (allKnownNodes,0);
+    vector < vector <double> > distSumMatrix = vector < vector <double> > ( allKnownNodes, vector <double> (allKnownNodes,0));
+    vector < vector <double> > distSqSumMatrix = vector < vector <double> > ( allKnownNodes, vector <double> (allKnownNodes,0));
+    vector < vector <double> > distStdDevMatrix = vector < vector <double> > ( allKnownNodes, vector <double> (allKnownNodes,0));
+    vector < vector <double> > distStdDevFluctMatrix = vector < vector <double> > ( allKnownNodes, vector <double> (allKnownNodes,0));
+    vector < vector <double> > tranMatrix = vector < vector <double> > ( allKnownNodes, vector <double> (allKnownNodes,0));
+    vector < vector <double> > tranMatrixNormal = vector < vector <double> > ( allKnownNodes, vector <double> (allKnownNodes,0));
+    vector < double > tranArrayNormal = vector <double> (allKnownNodes,0);
 
-    for (int i=0;i<graph.nodesLst.size();i++) {
+    for (size_t i=0;i<graph.nodesLst.size();i++) {
         if (graph.nodesLst[i].auxID>=0) {
             coreName[graph.nodesLst[i].auxID]=i;
         }
@@ -2090,33 +2093,52 @@ void partRWTransitionCounter(Graph graph, char* dumpDir, char* nettype, int num_
 
     cout<<"indexes found for "<< allKnownNodes <<" nodes"<<endl;
     for (int walker=0;walker<num_walker;walker++) {
-        float jumpCnt=0;
+        float totalJumpCnt=0;
         unsigned int initial_point;
         do {
             initial_point=rand()%graph.nodesLst.size();
         } while (graph.nodesLst[initial_point].neighbors->size()==0);
         int next = initial_point;
-        int prevKnownIndex = -1;
-        int prevKnownStep = -1;
+        int prvKnownIndex = -1;
+        int newKnownIndex = -1;
+        int prvKnownStep = -1;
 
         for (int step=0;step<walkLen;step++) {
             next=nextNodeIdSnowBall(graph.nodesLst[next]);
             if (graph.nodesLst[next].auxID>=0) {
-                if (prevKnownIndex>=0) {
-                    if (prevKnownIndex != graph.nodesLst[next].auxID) {
-                        tranMatrixNormal[prevKnownIndex][graph.nodesLst[next].auxID]+=1.0/graph.nodesLst[next].neighbors->size();
-                        tranArrayNormal[prevKnownIndex]+=1.0/graph.nodesLst[next].neighbors->size();
-                        jumpCnt++;
+                newKnownIndex = graph.nodesLst[next].auxID;
+                if (prvKnownIndex>=0) {
+                    if (prvKnownIndex != newKnownIndex) {
+                        totalJumpCnt++;
 
-                        distMatrix[prevKnownIndex][graph.nodesLst[next].auxID] += step-prevKnownIndex;
-                        tranMatrix[prevKnownIndex][graph.nodesLst[next].auxID] += 1.0;
+                        int deg = graph.nodesLst[next].neighbors->size();
+                        int n = tranMatrix[prvKnownIndex][newKnownIndex] + 1;
+                        int dist = step-prvKnownStep;
+
+                        tranMatrixNormal[prvKnownIndex][newKnownIndex] += 1.0/deg;
+                        tranArrayNormal[prvKnownIndex] += 1.0/deg;
+
+                        tranMatrix[prvKnownIndex][newKnownIndex] = n;
+
+                        distSumMatrix[prvKnownIndex][newKnownIndex] += dist;
+                        distSqSumMatrix[prvKnownIndex][newKnownIndex] += pow(dist,2);
+
+                        if (n>2) {
+                            double mean   = distSumMatrix[prvKnownIndex][newKnownIndex] / n;
+                            double stdDev = sqrt((distSqSumMatrix[prvKnownIndex][newKnownIndex] / n) - pow(mean, 2));
+                            if (n>3) {
+                                double oldStdDev = distStdDevMatrix[prvKnownIndex][newKnownIndex];
+                                distStdDevFluctMatrix[prvKnownIndex][newKnownIndex] = stdDev - oldStdDev;
+                            }
+                            distStdDevMatrix[prvKnownIndex][newKnownIndex] = stdDev;
+                        }
                     }
+                    prvKnownStep = step;
                 }
-                prevKnownIndex = graph.nodesLst[next].auxID;
-                prevKnownStep = step;
+                prvKnownIndex = newKnownIndex;
             }
         }
-        cout<<"Walk "<<walker<<" ended: "<<jumpCnt<<endl;
+        cout<<"Walk "<<walker<<" ended: "<<totalJumpCnt<<endl;
     }
 
     float maxJumps = 0;
@@ -2130,8 +2152,6 @@ void partRWTransitionCounter(Graph graph, char* dumpDir, char* nettype, int num_
     char fname[1024];
     sprintf(fname,"%s/%s_jumpCount.txt",dumpDir,nettype);
     cout<<fname<<endl;
-    // string fileName=fname;
-    // ofile.open((const char*)fname,ios::out);
     ofile.open(outFile,ios::out);
     for (int i=0;i<allKnownNodes;i++) {
         for (int j=0;j<allKnownNodes;j++) {
@@ -2140,19 +2160,18 @@ void partRWTransitionCounter(Graph graph, char* dumpDir, char* nettype, int num_
                     <<"\t"<<tranMatrixNormal[i][j]/tranArrayNormal[i]
                     <<"\t"<<tranMatrixNormal[i][j]
                     <<"\t"<<(tranMatrixNormal[i][j]*maxJumps/tranArrayNormal[i])+(tranMatrixNormal[j][i]*maxJumps/tranArrayNormal[j])
-                    <<"\t"<<distMatrix[i][j]
-                    <<"\t"<<tranMatrix[i][j]<<endl;
+                    <<"\t"<<tranMatrix[i][j]
+                    <<"\t"<<distSumMatrix[i][j]
+                    <<"\t"<<distSqSumMatrix[i][j]
+                    <<"\t"<<distStdDevMatrix[i][j]
+                    <<"\t"<<distStdDevFluctMatrix[i][j]<<endl;
             }
-            //			else {
-            //				ofile<<i<<"\t"<<j<<"\t"<<0<<"\t"<<0<<"\t"<<0<<endl;
-            //			}
         }
     }
     ofile.close();
 
     sprintf(fname,"%s/%s_index.txt",dumpDir,nettype);
     ofile.open((const char*)fname,ios::out);
-    //	ofile.open(outFile,ios::out);
     for (int i=0;i<allKnownNodes;i++){
         ofile<<i<<"\t"<<coreName[i]<<endl;
     }
